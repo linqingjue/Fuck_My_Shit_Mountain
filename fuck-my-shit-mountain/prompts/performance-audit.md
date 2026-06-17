@@ -1,91 +1,38 @@
-# Performance Audit Prompt
+# Performance Audit Prompt（性能审计提示词）
 
-Use the fuck-my-shit-mountain skill in **performance mode**.
+使用 fuck-my-shit-mountain skill 的 **performance mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on realistic bottlenecks, not premature micro-optimization.
+## 聚焦范围
 
-## Audit Areas (see principle 10.2: Unbounded Resources)
+只报告有证据支撑的现实性能风险。不要因为某段代码“看起来不够优雅”就推断性能差。
 
-### Hot Paths
-- Request handler latency
-- Inner loop performance
-- Allocation frequency on hot paths
-- Serialization/deserialization on critical paths
+## 审计区域
 
-### Data Access
-- Database query patterns (N+1, missing indexes, full table scans)
-- Cache miss ratio
-- Connection pool utilization
-- Query result size
-- Data pagination
+### 热路径
+- 关键请求、渲染、批处理、启动流程是否存在明显瓶颈？
+- 是否有不必要的同步 I/O、重复计算、重复网络请求？
 
-### Concurrency & Locking
-- Lock contention on hot paths
-- Serialization bottlenecks
-- Channel / queue backpressure
-- Mutex / RwLock granularity
+### 算法复杂度
+- 输入规模增大时是否会出现 O(n²) 或更差行为？
+- 是否存在可被用户输入放大的循环、递归或全量扫描？
 
-### Memory
-- Unbounded collection growth
-- Memory allocation patterns
-- Object pooling or lack thereof
-- Large object retention
-- Memory fragmentation (GC languages)
-- Slice / array copying on hot paths
+### 内存与资源
+- 是否有大对象复制、无限缓存、未释放资源？
+- 是否可能把整个文件、结果集、响应体一次性加载到内存？
 
-### I/O
-- Synchronous I/O in async context
-- File I/O pattern (read size, buffering)
-- Network round-trip count
-- Payload size optimization
-- Compression usage
+### I/O 与外部依赖
+- 数据库查询是否有 N+1、缺索引、重复查询？
+- 网络请求是否有超时、批量、缓存、并发限制？
 
-### Frontend (if applicable)
-- Re-render frequency
-- Virtual DOM diff cost
-- Bundle size
-- Image / asset optimization
-- Lazy loading
-- List virtualization
+### 前端性能（如适用）
+- 是否存在过大组件、过度渲染、无界列表、阻塞主线程？
+- bundle 体积是否由重依赖或错误导入放大？
 
-### Startup & Initialization
-- Cold start time
-- Dependency loading
-- Configuration parsing
-- Lazy initialization opportunities
+## 规则
 
-## Rules
-
-1. Do not suggest optimization unless there is a realistic scale or workload where it matters.
-2. Identify the bottleneck mechanism, not just the symptom.
-3. Include the workload or conditions under which the issue becomes relevant.
-4. Prefer small, targeted optimizations over architectural changes when sufficient.
-
-## Attitude
-
-1. **Be exhaustive.** Scan every hot path, every query, every allocation pattern. One unoptimized query can kill production at scale.
-2. **Do not be a yes-man.** Report bottlenecks even if the user says "it's fast enough for now." Your job is to identify where it will break under load.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Performance
-- Status: Confirmed / Suspected
-- Affected area:
-- Evidence:
-  - File:
-  - Function / Module:
-  - Relevant behavior:
-- Workload where this matters:
-- Bottleneck mechanism:
-- Expected impact:
-- Minimal optimization:
-- Better long-term optimization:
-- Benchmark or test suggestion:
-- Estimated effort:
+1. 每条性能发现都必须说明触发条件和可能规模。
+2. 没有证据时，不要假设“慢”。可以写 Suspected，并说明需要测量。
+3. 优先建议测量、采样、预算和局部优化；不要直接建议重写。
+4. 每条发现都要包含验证方式，例如 benchmark、profiling、query plan、前端性能指标或负载测试。
