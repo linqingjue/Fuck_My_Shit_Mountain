@@ -1,78 +1,26 @@
-# AI and LLM Safety Audit Prompt
+# AI and LLM Safety Audit Prompt（AI 与 LLM 安全审计提示词）
 
-Use the fuck-my-shit-mountain skill in **ai-safety mode**.
+使用 fuck-my-shit-mountain skill 的 **ai-safety mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on AI/LLM application risks: prompt injection, tool authorization, RAG data leakage, model fallback, eval coverage, hallucination-sensitive workflows, and cost/abuse controls. Use this mode only when the project includes AI, LLM, agent, embedding, RAG, or model-serving behavior.
+## 聚焦范围
 
-## Audit Areas
+检查项目中与 LLM、Agent、RAG、工具调用、模型输出和自动化决策相关的安全边界。只报告有实际攻击路径、泄露路径或成本滥用路径的问题。
 
-### Prompt and Instruction Boundaries
-- Untrusted content is placed next to system/developer instructions without isolation.
-- Retrieved documents, web pages, emails, tickets, or user files can override tool policy.
-- Prompt templates concatenate role-like text or hidden directives unsafely.
-- No separation between user intent, retrieved context, and execution policy.
-- Sensitive instructions or chain-of-thought-like internals are exposed.
+## 审计区域
 
-### Tool and Action Authorization
-- Model output can trigger file, network, database, billing, email, or admin actions without policy checks.
-- Tool arguments are trusted because they came from the model.
-- Missing confirmation for irreversible or externally visible actions.
-- Least-privilege scopes are not enforced per user/session/task.
-- Tool results containing secrets are fed back into later prompts unnecessarily.
+- PromptInjection：不可信内容是否能改变系统指令、工具调用或安全策略。
+- ToolAuthorization：模型是否能绕过确定性权限检查直接调用工具。
+- RAGLeakage：检索是否按用户权限过滤，是否可能泄露跨租户/私有数据。
+- ModelFallback：fallback 是否显式、有边界、可观测，是否静默改变安全等级。
+- OutputValidation：结构化输出、代码、SQL、URL、文件路径是否经过校验。
+- EvalGap：是否缺少安全、策略、越权、注入、回归 eval。
+- AbuseCost：token、模型、并发、工具调用是否有预算和限流。
 
-### RAG and Data Leakage
-- Retrieval crosses tenant, account, workspace, or permission boundaries.
-- Embeddings/indexes include sensitive data without deletion or access controls.
-- Source attribution is missing for high-impact answers.
-- Search filters are applied after retrieval instead of before.
-- Cached model responses leak data across users or contexts.
+## 规则
 
-### Model Reliability and Fallbacks
-- Model fallback changes capability, cost, latency, or safety behavior silently.
-- Outputs are used as facts without verification where correctness matters.
-- JSON/function call parsing accepts malformed or partial outputs.
-- No timeout, retry, or circuit breaker around model calls.
-- No deterministic guardrail for safety-critical decisions.
-
-### Evaluation and Monitoring
-- No evals for prompt injection, data leakage, refusal/override, or tool misuse.
-- Tests only assert happy-path text, not policy behavior.
-- No logging/metrics for model errors, refusal rates, tool calls, token cost, or latency.
-- No red-team corpus or regression suite for known failures.
-- Production incidents cannot be traced to prompt/model/config version.
-
-### Abuse and Cost Controls
-- No rate limits, quotas, token budgets, or per-user spend tracking.
-- Attackers can trigger expensive retrieval, long context, or recursive tool/model calls.
-- Uploads or inputs can poison retrieval indexes.
-- Moderation/safety checks are only applied after action execution.
-
-## Rules
-
-1. If the project has no AI/LLM surface, mark this mode Not assessed with evidence.
-2. Every AI safety finding must identify attacker/user capability and the model/tool/data boundary crossed.
-3. Do not rely on prompt wording alone as a security control for tool execution.
-4. Prefer deterministic authorization, scoped retrieval, structured validation, evals, and budget limits.
-5. Treat cross-tenant data leakage and unauthorized tool execution as High or Critical depending on blast radius.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Security / Stability / Testing / Performance
-- Status: Confirmed / Suspected
-- Subtype: PromptInjection / ToolAuthorization / RAGLeakage / ModelFallback / OutputValidation / EvalGap / AbuseCost
-- Boundary crossed:
-- Evidence:
-  - File:
-  - Function / Module:
-  - Relevant behavior:
-- Attack or failure path:
-- Minimal fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 每条 AI 安全发现都必须说明不可信输入如何跨越边界。
+2. 不要把“用了 AI”本身当作风险；必须有具体数据流或工具边界证据。
+3. 权限必须由确定性代码执行，不能只靠 prompt 约束。
+4. 每条发现都要包含缓解措施和 eval/测试建议。
