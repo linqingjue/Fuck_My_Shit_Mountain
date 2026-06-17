@@ -1,81 +1,26 @@
-# Data Integrity Audit Prompt
+# Data Integrity Audit Prompt（数据完整性审计提示词）
 
-Use the fuck-my-shit-mountain skill in **data-integrity mode**.
+使用 fuck-my-shit-mountain skill 的 **data-integrity mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on whether the system preserves correct, durable, and recoverable data under failures, retries, concurrency, and upgrades.
+## 聚焦范围
 
-## Audit Areas
+检查系统是否能保护关键数据不丢失、不重复、不冲突、不违反业务不变量。只报告会造成真实数据错误的风险。
 
-### Transaction Boundaries
-- Multi-step writes without a transaction or equivalent atomicity guarantee.
-- External I/O performed while holding a transaction open.
-- Partial writes when a later operation fails.
-- Transaction retries missing for serialization/conflict errors.
-- Business invariants split across application code and database constraints.
+## 审计区域
 
-### Idempotency and Retries
-- POST/job/message handlers that are unsafe to retry.
-- Duplicate submissions create duplicate records or side effects.
-- Idempotency keys accepted but not enforced durably.
-- Background jobs can run twice after crash/restart.
-- Retry logic repeats non-idempotent external calls.
+- TransactionBoundary：多步写入是否有事务或原子性保障。
+- Idempotency：重试、回调、消息消费、支付/订单/任务是否能防重复。
+- ConcurrencyConsistency：并发写是否有锁、版本检查、CAS 或唯一约束。
+- MigrationSafety：迁移是否可重复、可回滚、可恢复、可观测。
+- InvariantValidation：业务不变量是否在边界和持久化层被校验。
+- BackupRestore：备份是否真的能恢复，恢复路径是否测试过。
+- Reconciliation：异步系统、缓存、索引、外部系统是否有对账/修复机制。
 
-### Concurrency Consistency
-- Lost update risks from read-modify-write without locking or compare-and-swap.
-- Missing optimistic locking/version checks on mutable records.
-- Race conditions between scheduled jobs and user actions.
-- Queue consumers process the same item concurrently.
-- Cache writes can overwrite newer data with stale data.
+## 规则
 
-### Migrations and Schema Evolution
-- Migrations cannot be run repeatedly or safely after partial failure.
-- Schema and application changes require impossible deployment ordering.
-- Missing backward/forward compatibility during rolling deploys.
-- No rollback plan for destructive migrations.
-- Data backfills lack progress tracking or restart safety.
-
-### Validation and Invariants
-- Invalid data can enter persistence because validation only happens in UI/client code.
-- Database constraints are missing for core invariants.
-- Derived values can drift from source-of-truth records.
-- Soft deletes, status transitions, or lifecycle states allow impossible combinations.
-- Timestamps, time zones, or ordering assumptions can corrupt business meaning.
-
-### Backup, Restore, and Reconciliation
-- Backup exists but restore is untested.
-- No reconciliation job for eventually consistent data.
-- No audit trail for high-impact mutations.
-- Deletes or destructive updates cannot be recovered.
-- Export/import paths lose precision, encoding, or identity.
-
-## Rules
-
-1. Every data-integrity finding must identify the invariant that can be violated.
-2. Prefer local fixes: transaction, constraint, idempotency key, version check, or migration guard.
-3. Treat data loss/corruption on normal operation as Critical.
-4. Distinguish performance denormalization from unsafe duplication; denormalization is acceptable if reconciliation exists.
-5. For each issue, include a regression test that simulates failure, retry, or concurrency when practical.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Stability / Release / Testing
-- Status: Confirmed / Suspected
-- Subtype: TransactionBoundary / Idempotency / ConcurrencyConsistency / MigrationSafety / InvariantValidation / BackupRestore / Reconciliation
-- Affected area:
-- Invariant at risk:
-- Evidence:
-  - File:
-  - Function / Module:
-  - Relevant behavior:
-- Problem:
-- Realistic failure scenario:
-- Minimal fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 每条发现必须说明会破坏哪类数据不变量。
+2. 不要只说“应该加事务”；要指出具体写入序列和失败点。
+3. 对幂等、并发、迁移问题必须给出触发条件。
+4. 每条发现都要包含验证方式，例如并发测试、重复请求测试、迁移重跑测试或恢复演练。
