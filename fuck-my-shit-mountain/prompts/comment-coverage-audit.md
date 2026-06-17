@@ -1,73 +1,25 @@
-# Comment Coverage Audit Prompt
+# Comment Coverage Audit Prompt（注释覆盖审计提示词）
 
-Use the fuck-my-shit-mountain skill in **comment-coverage mode**.
+使用 fuck-my-shit-mountain skill 的 **comment-coverage mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on documentation quality, comment coverage of public APIs, stale/misleading comments, and the balance between useful documentation and unnecessary noise.
+## 聚焦范围
 
-## Audit Areas
+检查注释是否解释了必要的意图、约束、边界和风险，而不是机械要求“多写注释”。只报告缺失、过期或误导性注释会造成真实维护风险的情况。
 
-### Public API Documentation
-- Public functions/types/constants without doc comments (where the language/ecosystem expects them).
-- Missing module-level documentation (no module overview, no purpose statement).
-- API surfaces that lack examples or usage guidance.
-- Parameters or return values not documented (especially non-obvious ones like boolean flags, magic numbers, or error conditions).
+## 审计区域
 
-### Stale / Misleading Comments
-- Comments that describe behavior no longer true (refactored code, changed assumptions).
-- "TODO" / "FIXME" / "HACK" / "XXX" comments that are years old with no associated issue or plan.
-- Comments that lie (describe one thing, code does another).
-- Commented-out code blocks without explanation of why they're kept.
-- Outdated file headers, copyright dates, or author lines.
+- 复杂业务规则是否说明为什么这样做。
+- 危险边界、并发、缓存、权限、数据迁移、兼容逻辑是否有必要注释。
+- 注释是否过期，与代码行为冲突。
+- 注释是否只重复代码，没有解释意图。
+- 公共 API、配置、脚本、运维入口是否有足够说明。
+- 生成代码或第三方代码是否被误判为需要注释。
 
-### Over-commenting / Noise
-- Comments that simply restate the code in English (`i += 1  // increment i`).
-- Comment headers for trivial sections (`// Getters`, `// Constructor`).
-- Change log comments in file headers (`2024-01-01: fixed bug` — that's what git is for).
-- Comments that explain "what" instead of "why".
+## 规则
 
-### Module / Package Documentation
-- Missing README or module-level docs for key packages.
-- Missing architecture decision records (ADR) for non-obvious design choices.
-- Missing setup/configuration documentation for development environment.
-- No documented error handling strategy or conventions.
-
-### Inline Comment Quality
-- Comments that don't add context (explaining trivial code, missing explanation of non-trivial code).
-- Magic numbers/strings without explanation.
-- Complex algorithms or business rules without rationale comments.
-- Safety invariants (lock ordering, memory ownership, thread safety assumptions) not documented.
-
-### Self-Documenting Code
-- Code so convoluted that even a well-written comment can't save it — consider this a finding.
-- Functions with 7+ parameters that need a novel to explain what each does.
-- Names so misleading that they contradict what the code actually does.
-
-## Rules
-
-1. A missing doc comment on every trivial getter/setter is not a finding. A missing doc on a public API that has unclear preconditions or side effects is.
-2. Prioritize stale/misleading comments over missing ones — wrong docs are worse than no docs.
-3. Consider the project's language ecosystem norms (Rust expects doc comments on pub items, Python less so).
-4. Flag commented-out code only if it's extensive (5+ lines) or has been there for multiple commits.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Maintainability
-- Status: Confirmed / Suspected
-- Subtype: MissingDoc / StaleComment / NoiseComment / MissingModuleDoc / PoorInlineComment / NotSelfDocumenting
-- Evidence:
-  - File(s):
-  - Function / Module:
-  - Current comment (or absence):
-- Why this matters:
-- Impact on maintainability or onboarding:
-- Minimal fix:
-- Better long-term fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 不要把每个函数缺注释都报成问题。
+2. 每条发现必须说明缺少或错误注释会如何导致误改、误用或风险遗漏。
+3. 修复建议应写明注释应放在哪里、解释什么，而不是泛泛要求“补注释”。
+4. 每条发现都要包含验证方式，例如文档检查、代码审查规则或示例补充。

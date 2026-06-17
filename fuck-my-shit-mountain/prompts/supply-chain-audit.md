@@ -1,72 +1,24 @@
-# Supply Chain and Reproducibility Audit Prompt
+# Supply Chain and Reproducibility Audit Prompt（供应链与可复现性审计提示词）
 
-Use the fuck-my-shit-mountain skill in **supply-chain mode**.
+使用 fuck-my-shit-mountain skill 的 **supply-chain mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on dependency provenance, build reproducibility, artifact integrity, CI pinning, release signing, SBOM, and supply-chain attack surface.
+## 聚焦范围
 
-## Audit Areas
+检查依赖、构建、CI、制品和发布链路是否可信、可复现、可追溯。只报告有现实攻击面或发布风险的问题。
 
-### Dependency Provenance
-- Dependencies pulled from mutable branches, unpinned Git refs, or unauthenticated URLs.
-- Internal package names vulnerable to dependency confusion.
-- Install scripts, build scripts, or postinstall hooks execute unreviewed code.
-- Transitive dependencies with unclear maintenance or ownership.
-- Native binaries downloaded during install/build without verification.
+## 审计区域
 
-### Lockfiles and Reproducibility
-- Missing or ignored lockfiles for apps/services.
-- Lockfiles not enforced in CI.
-- Builds depend on current time, network, local machine paths, or ambient credentials.
-- Generated artifacts differ across machines without explanation.
-- Toolchain versions are not pinned or checked.
+- DependencyProvenance：依赖来源是否可信，是否锁定版本和 registry。
+- Reproducibility：构建是否可复现，工具链是否固定。
+- CIIntegrity：workflow 权限、secret 暴露、PR 执行策略是否安全。
+- ArtifactProvenance：制品是否有校验、签名、SBOM、来源记录。
+- RegistryHygiene：包内容、发布权限、维护者、命名是否安全。
 
-### CI/CD Integrity
-- GitHub Actions or third-party actions pinned only to tags instead of SHAs where risk warrants SHA pinning.
-- CI jobs run untrusted PR code with secrets.
-- Release workflows can be triggered by unauthorized actors or branches.
-- Build/test steps download scripts with curl | sh style patterns.
-- Caches can poison later builds.
+## 规则
 
-### Artifact Provenance
-- Release artifacts are not signed or checksummed where users download them.
-- No SBOM, provenance statement, or dependency inventory for public releases.
-- Container images do not pin base images by digest.
-- Build and release artifacts are produced by different code paths.
-- Source archive does not match shipped binary/container.
-
-### Package and Registry Hygiene
-- Published packages lack ownership, two-factor requirements, or scoped registry config.
-- Versioning can overwrite or shadow existing artifacts.
-- Package contents include secrets, local files, test fixtures, or unnecessary build outputs.
-- License conflicts or missing notices.
-
-## Rules
-
-1. Scale recommendations to distribution risk. Public packages and install scripts deserve stricter treatment than private prototypes.
-2. Do not duplicate dependency-weight findings unless supply-chain risk is the core issue.
-3. For each issue, identify attacker precondition and artifact/build surface.
-4. Prefer pinning, verification, least privilege, reproducible builds, and provenance over broad toolchain swaps.
-5. Treat secrets exposed to untrusted CI as Critical or High depending on blast radius.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Security / Release
-- Status: Confirmed / Suspected
-- Subtype: DependencyProvenance / Reproducibility / CIIntegrity / ArtifactProvenance / RegistryHygiene
-- Affected surface:
-- Evidence:
-  - File:
-  - Workflow / manifest / artifact:
-  - Relevant behavior:
-- Attack precondition:
-- Problem:
-- Minimal fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 每条发现必须说明攻击路径或发布破坏路径。
+2. 不要报告没有证据的理论供应链风险。
+3. 修复建议优先包括 lock、pin、权限最小化、可复现构建、签名和制品校验。
+4. 每条发现都要包含验证方式，例如 clean build、CI 权限检查、制品校验或依赖来源核对。

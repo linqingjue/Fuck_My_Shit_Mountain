@@ -1,73 +1,25 @@
-# Accessibility and UX Correctness Audit Prompt
+# Accessibility and UX Correctness Audit Prompt（可访问性与 UX 正确性审计提示词）
 
-Use the fuck-my-shit-mountain skill in **accessibility mode**.
+使用 fuck-my-shit-mountain skill 的 **accessibility mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on whether browser/client UI workflows remain usable, understandable, and correct across keyboard, screen reader, responsive, loading, empty, and error states.
+## 聚焦范围
 
-## Audit Areas
+检查界面是否能被键盘、屏幕阅读器、不同尺寸设备和异常状态下的用户正确使用。只报告会影响真实可用性或正确性的风险。
 
-### Semantic Structure
-- Interactive elements built from non-semantic elements without roles or keyboard handling.
-- Inputs without labels or accessible names.
-- Icon-only controls without accessible labels.
-- Headings, landmarks, dialogs, tabs, and menus not represented semantically.
-- Status messages not announced to assistive technology.
+## 审计区域
 
-### Keyboard and Focus
-- Critical workflows unavailable by keyboard.
-- Focus lost, trapped incorrectly, or not restored after modal/route changes.
-- Roving tab index, menu navigation, or tab panels implemented incorrectly.
-- Keyboard shortcuts conflict with browser or assistive technology behavior.
-- Disabled/loading states leave focus on unusable controls.
+- SemanticStructure：按钮、表单、导航、标题层级是否语义正确。
+- KeyboardFocus：键盘可达性、焦点顺序、焦点陷阱、快捷键冲突。
+- ResponsiveVisual：响应式布局、触控目标、对比度、溢出和遮挡。
+- ErrorState：错误是否与输入关联，文案是否可理解。
+- LoadingState：加载、禁用、重复提交、陈旧数据是否处理正确。
+- UXStateCorrectness：UI 状态是否与服务端状态一致。
 
-### Visual and Responsive Correctness
-- Text, controls, or overlays overlap on realistic viewport sizes.
-- Contrast, focus ring, hover-only affordances, or disabled state is unclear.
-- Dynamic content shifts layout in a way that causes wrong clicks.
-- Touch targets are too small or too close.
-- Zoom/text scaling breaks workflows.
+## 规则
 
-### Error, Empty, and Loading States
-- Forms do not associate validation errors with fields.
-- Async failures leave stale data or disabled controls.
-- Loading states hide the user's current task or cause duplicate submissions.
-- Empty states lack the actionable controls needed to recover.
-- Error messages are not specific enough for users to fix input.
-
-### UX Data Flow Correctness
-- UI displays state different from persisted/server state.
-- Optimistic updates do not roll back on failure.
-- Request cancellation or route changes show wrong data.
-- Client-side validation disagrees with backend validation.
-- Critical actions lack confirmation or undo where the domain requires it.
-
-## Rules
-
-1. This mode applies to browser/client UI projects. For non-UI projects, mark Not assessed with evidence.
-2. Do not report generic accessibility advice; tie every finding to a real workflow.
-3. Prefer semantic HTML and small component fixes over adding heavy UI libraries.
-4. When practical, verify with browser inspection, keyboard flow, or accessibility tree evidence.
-5. Include a regression test suggestion using the project's UI test stack when available.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Testing / Maintainability / Design
-- Status: Confirmed / Suspected
-- Subtype: SemanticStructure / KeyboardFocus / ResponsiveVisual / ErrorState / LoadingState / UXStateCorrectness
-- Affected workflow:
-- Evidence:
-  - File:
-  - Component / View:
-  - Relevant behavior:
-- Problem:
-- User-visible failure scenario:
-- Minimal fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 每条发现必须说明具体用户流程和受影响用户。
+2. 不要只列 WCAG 名词；必须联系代码或 UI 行为。
+3. 对无浏览器 UI 的项目，应标记 Not assessed，而不是硬编问题。
+4. 每条发现给出可执行修复和验证方式，例如键盘路径、屏幕阅读器检查、响应式断点或组件测试。

@@ -1,75 +1,26 @@
-# Type Safety Audit Prompt
+# Type Safety Audit Prompt（类型安全审计提示词）
 
-Use the fuck-my-shit-mountain skill in **type-safety mode**.
+使用 fuck-my-shit-mountain skill 的 **type-safety mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on whether the type system is providing real safety guarantees or is being bypassed through escape hatches.
+## 聚焦范围
 
-## Audit Areas
+检查类型系统是否被绕过，或边界类型是否不足以表达真实约束。只报告会造成运行时错误、数据错误或维护风险的类型问题。
 
-### Unsafe and Escape Hatches
-- `unsafe` blocks — are they justified? Do they have safety comments?
-- `any` / `unknown` casts without narrowing.
-- Type assertions (`as Type`, `as!`, `unchecked_cast`) — are they provably correct?
-- Non-null assertions (`!`, `unwrap()`, `!!`) — can the value actually be null?
-- `// @ts-ignore` / `// @ts-expect-error` — how many, what are they hiding?
+## 审计区域
 
-### Input Boundary Weakness
-- API request bodies typed as `any` / `serde_json::Value` / `Dictionary` without validation.
-- Config files parsed without schema validation.
-- User input accepted as the target type without parsing/validation step.
-- Database query results cast to model types without runtime verification.
+- UnsafeBlock：unsafe、裸指针、手动内存、跨 FFI 边界是否被隔离和证明安全。
+- TypeAssertion：强制类型断言、cast、any/unknown 滥用是否掩盖错误。
+- InputBoundary：外部输入是否从不可信类型转为可信类型前经过校验。
+- OutputLeak：内部类型是否泄露到 API 或外部契约。
+- BooleanTrap：布尔参数是否造成调用歧义。
+- StringlyTyped：关键概念是否用裸 string/number 表示，导致误传。
+- ErrorType：错误类型是否可区分、可处理、可测试。
 
-### Output Boundary Leakage
-- Internal types exposed in public API responses.
-- Sensitive fields not excluded from serialization.
-- Error types that leak internal state (stack traces, DB queries, IPs).
+## 规则
 
-### State Representation
-- Boolean parameters that create confusing call sites (boolean trap — principle 3.5).
-- Stringly-typed values that should be enums or sum types.
-- `null` / `undefined` / `nil`/ `None` used to represent "not found" vs "error" vs "not initialized".
-- Shared mutable state without type-level synchronization guarantees.
-- Magic strings/numbers used where constants or enums would constrain values.
-
-### Error Type Quality
-- Generic error types (`Box<dyn Error>`, `Exception`, `string`) in public APIs.
-- Errors that lose the original cause (no wrapping, no context).
-- Catch-all error handlers that return a generic 500 without details.
-- Missing `#[non_exhaustive]` on public error enums.
-
-### Generics and Trait Bounds
-- Overly permissive generic bounds (accepting `Any`/`Object` when concrete type is known).
-- Traits with too many methods (ISP violation).
-- Associated types that leak implementation details.
-
-## Rules
-
-1. Every `unsafe` block must have a safety comment explaining why it is safe.
-2. Every type assertion must be provably correct in all code paths.
-3. If the language supports sum types / enums / ADTs, prefer them over `null` + boolean flags.
-4. External input must have a validation boundary — typed is not the same as validated.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Security / Stability / Design
-- Status: Confirmed / Suspected
-- Subtype: UnsafeBlock / TypeAssertion / InputBoundary / OutputLeak / BooleanTrap / StringlyTyped / ErrorType
-- Affected area:
-- Evidence:
-  - File:
-  - Function / Type:
-  - Relevant behavior:
-- Problem:
-- Why it weakens safety guarantees:
-- Realistic failure scenario:
-- Minimal fix (tighter type):
-- Better long-term fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 每条类型安全发现必须说明类型系统没能阻止的具体错误。
+2. 不要把所有 any/cast 都视为问题；只有跨边界、关键逻辑或重复出现才报告。
+3. 修复建议优先使用边界解析、窄化类型、枚举/联合类型、newtype、显式错误类型。
+4. 每条发现都要包含能证明类型保护有效的测试或编译检查建议。

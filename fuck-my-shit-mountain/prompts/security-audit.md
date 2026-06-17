@@ -1,91 +1,78 @@
-# Security Audit Prompt
+# Security Audit Prompt（安全审计提示词）
 
-Use the fuck-my-shit-mountain skill in **security mode**.
+使用 fuck-my-shit-mountain skill 的 **security mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus only on security-relevant risks.
+只关注与安全相关的真实风险。
 
-## Audit Areas (see principle 4.6: Least Privilege)
+## 审计区域（参考原则 4.6：Least Privilege）
 
-### Authentication & Authorization
-- How does the application identify users?
-- How does it determine what each user can do?
-- Can a user access resources they should not have access to?
-- Are there hardcoded credentials, tokens, or API keys?
-- How are sessions managed? Token lifecycle?
+### 认证与授权
+- 应用如何识别用户？
+- 如何判断每个用户能做什么？
+- 用户是否能访问不该访问的资源？
+- 是否存在硬编码凭据、token 或 API key？
+- session 如何管理？token 生命周期是否清楚？
 
-### Input & Output
-- Injection vectors (command, SQL, NoSQL, LDAP, template)
-- Path traversal in file operations
-- SSRF in URL fetching or proxy features
-- CORS configuration
-- CSRF protection
-- Serialization of untrusted data
+### 输入与输出
+- 注入向量：命令、SQL、NoSQL、LDAP、模板注入等。
+- 文件操作中的路径穿越。
+- URL 拉取、代理功能中的 SSRF。
+- CORS 配置。
+- CSRF 防护。
+- 不可信数据序列化/反序列化。
 
-### Secrets & Configuration
-- Hardcoded secrets in code, tests, or config files
-- Secrets in environment variables with unsafe defaults
-- Secrets in logs, error messages, or debug output
-- Config files committed to version control
-- Unsafe default configurations
+### Secrets 与配置
+- 代码、测试、配置中的硬编码 secret。
+- 环境变量中的不安全默认值。
+- 日志、错误消息或 debug 输出中的 secret。
+- 提交到版本库的敏感配置文件。
+- 不安全默认配置。
 
-### Network & Transport
-- TLS configuration
-- WebSocket authentication and origin checking
-- API endpoint exposure (internal vs external)
-- Rate limiting and brute-force protection
+### 网络与传输
+- TLS 配置。
+- WebSocket 认证与 origin 检查。
+- API 暴露范围：内部 / 外部。
+- 速率限制和暴力破解防护。
 
-### Dependencies
-- Known vulnerable dependencies
-- Supply chain risks (install scripts, postinstall hooks, build-time code execution)
-- Unnecessary dependencies expanding attack surface
-- Dependency confusion (public package shadowing internal name)
+### 依赖
+- 已知漏洞依赖。
+- 供应链风险：install script、postinstall hook、构建期代码执行。
+- 扩大攻击面的不必要依赖。
+- dependency confusion：公开包名遮蔽内部包名。
 
-### Operational Security
-- File permissions on sensitive files
-- Logging of sensitive data (passwords, tokens, PII)
-- Debug endpoints left enabled
-- Error handling that leaks internal state
-- Information disclosure in response headers or error pages
+### 运维安全
+- 敏感文件权限。
+- 密码、token、PII 等敏感数据日志。
+- 遗留 debug endpoint。
+- 泄露内部状态的错误处理。
+- 响应头或错误页中的信息泄露。
 
-## Rules
+## 规则
 
-1. Every security finding must include an attack precondition and attack path.
-2. Do not report theoretical vulnerabilities without a realistic exploitation path.
-3. Separate confirmed issues from suspected issues.
-4. For each issue, include a specific mitigation and a regression test.
+1. 每条安全发现都必须包含攻击前提和攻击路径。
+2. 不报告没有现实利用路径的纯理论漏洞。
+3. 区分 Confirmed 与 Suspected。
+4. 每个问题都要包含具体缓解措施和回归测试。
 
-## Attitude
+## 态度
 
-1. **Be exhaustively systematic.** Check all in-scope endpoints, auth paths, input boundaries, and dependency evidence. Follow the skill's coverage strategy and document exclusions honestly.
-2. **Do not be a yes-man.** Report security issues objectively. Do not downplay because the project "is just internal" or "nobody will attack us."
+1. **必须系统化。** 检查范围内所有 endpoint、认证路径、输入边界和依赖证据。遵循 skill 的覆盖策略，并诚实记录排除项。
+2. **不要当 yes-man。** 客观报告安全问题。不要因为项目“只是内部系统”或“没人会攻击”而降低风险判断。
 
+## Finding 格式补充
 
-## Finding Format
+安全类发现除通用字段外，还要写清：
 
-### Finding: <short title>
+- Attack precondition: <攻击前提>
+- Attack path: <攻击路径>
+- Impact: <影响>
+- Mitigation: <缓解措施>
 
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Security
-- Status: Confirmed / Suspected
-- Affected area:
-- Evidence:
-  - File:
-  - Function / Module:
-  - Relevant behavior:
-- Attack precondition:
-- Attack path:
-- Impact:
-- Mitigation:
-- Regression test suggestion:
-- Estimated effort:
+## 不要浪费输出在
 
-## Focus
-
-Do not waste output on:
-- HTTPS enforcement when the app is designed for local-only use
-- CSP headers when the app has no browser UI
-- Theoretical supply chain attacks without evidence
-- Missing auth on endpoints that are explicitly public
+- 只在本地使用的应用却强行讨论 HTTPS enforcement。
+- 没有浏览器 UI 的应用却强行讨论 CSP header。
+- 没有证据的理论供应链攻击。
+- 明确公开的 endpoint 缺少 auth。

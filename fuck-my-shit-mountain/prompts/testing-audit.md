@@ -1,81 +1,37 @@
-# Testing Audit Prompt
+# Testing Audit Prompt（测试审计提示词）
 
-Use the fuck-my-shit-mountain skill in **testing mode**.
+使用 fuck-my-shit-mountain skill 的 **testing mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on whether the tests provide real confidence in the codebase.
+## 聚焦范围
 
-## Audit Areas (see principles 8.1–8.5)
+评估测试是否能提供真实回归信心，而不是只看覆盖率数字或绿色勾。
 
-### Coverage Quality (not quantity)
-- Critical paths without test coverage
-- Error handling paths without test coverage
-- Edge cases in input validation
-- Boundary conditions
-- Failure mode testing
+## 审计区域
 
-### Test Types
-- Unit test coverage of core logic
-- Integration test coverage of external interfaces
-- End-to-end test coverage of critical user flows
-- Snapshot / golden file test quality
-- Property-based or fuzz test coverage where appropriate
+### 测试覆盖
+- 关键业务路径是否有测试？
+- 错误路径、边界输入、权限、并发、外部依赖失败是否有测试？
+- 是否只有 happy path？
 
-### Test Patterns
-- Tests that only cover happy paths
-- Tests that are over-mocked (testing mock behavior, not real behavior)
-- Tests that assert implementation details (brittle)
-- Tests that exist only for coverage metrics
-- Tests that are flaky (non-deterministic)
+### 测试质量
+- 测试是否断言真实行为，而不是实现细节？
+- mock 是否过多，以至于绕过真正风险？
+- 测试是否脆弱、顺序相关、依赖时间或外部环境？
 
-### Missing Tests
-- Regression tests for past bugs
-- Concurrency / race condition tests
-- Performance / benchmark tests
-- Upgrade / migration tests
-- Configuration permutation tests
-- Security tests (auth bypass, injection, permission)
+### 测试类型
+- 单元测试、集成测试、端到端测试是否分工清楚？
+- 数据库、网络、文件系统、队列等边界是否有足够集成测试？
 
-### Test Infrastructure
-- CI test execution (speed, parallelism, ordering)
-- Test data management (fixtures, factories, cleanup)
-- Test isolation (shared state between tests)
-- Test environment consistency
-- Test reporting (what breaks, where, why)
+### 可维护性
+- 测试命名是否说明场景？
+- 失败信息是否可诊断？
+- 测试数据是否清晰、隔离、可复现？
 
-## Attitude
+## 规则
 
-1. **Be exhaustively systematic.** Check in-scope critical paths, error paths, edge cases, and test layers. Follow the skill's coverage strategy and document exclusions honestly.
-2. **Do not be a yes-man.** Report testing gaps even if the user says "we have good coverage." Coverage percentage does not equal confidence.
-
-## Grouping
-
-Group recommendations into:
-
-- **Must add** — without these, the project cannot be confidently released
-- **Should add** — significant confidence gap
-- **Nice to have** — incremental improvement
-- **Not worth testing** — trivial, stable, or generated code
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Testing
-- Status: Confirmed / Suspected
-- Affected area:
-- Evidence:
-  - File:
-  - Function / Module:
-  - Relevant behavior:
-- Behavior to test:
-- Why it matters:
-- Suggested test type: Unit / Integration / E2E / Property / Fuzz
-- Minimal test case:
-- Failure it would catch:
-- Estimated effort:
-- Priority: Must add / Should add / Nice to have / Not worth testing
+1. 不要把“没有 100% 覆盖率”当作问题；只报告会让真实 bug 逃逸的缺口。
+2. 每条测试发现必须说明“什么 bug 会逃过现有测试”。
+3. 对无价值测试可以建议重写或删除，但必须说明原因。
+4. 每条发现给出具体新增/修改测试建议。

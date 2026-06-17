@@ -1,57 +1,57 @@
-# Shared Report Format Rules
+# 共享报告格式规则
 
-Load this reference when a prompt says to use shared setup/report rules.
+当 prompt 要求使用共享设置/报告规则时，加载本文件。
 
-## Required Context Before Auditing
+## 审计前的必要上下文
 
-Before reading code, verify that audit mode(s), report language, and output format are known. If any are missing, ask only for the missing item(s) in one concise message and wait for the answer. If they are already supplied by the user or by the invoking skill, proceed without re-asking.
+读取代码前，先确认 audit mode(s)、report language 和 output format 是否已知。若有缺失，只用一条简洁消息询问缺失项，并等待用户回答。若用户或调用方已经提供这些信息，直接继续，不要重复追问。
 
-## Report Template Constraint
+## 报告模板约束
 
-The report MUST follow the skill templates:
+报告必须遵循 skill 自身模板：
 
-- Findings use `templates/issue-card.md`.
-- Markdown reports use `templates/audit-report.md`.
-- HTML reports use `templates/audit-report.html`.
-- Do NOT copy formatting, heading style, or structure from markdown files inside the audited project.
-- The audited project's own README, docs, or comments are evidence, not the report template.
+- 发现项使用 `templates/issue-card.md`。
+- Markdown 报告使用 `templates/audit-report.md`。
+- HTML 报告使用 `templates/audit-report.html`。
+- 不要复制被审计项目内部 markdown 文件的格式、标题风格或结构。
+- 被审计项目自己的 README、docs 或注释只能作为证据，不能作为报告模板。
 
-## HTML Output Rules
+## HTML 输出规则
 
-For HTML output:
+HTML 输出必须满足：
 
-- Read `templates/audit-report.html`.
-- Generate complete, self-contained HTML.
-- Copy the exact CSS, section structure, classes, and ordering from the template.
-- Include only score items and dimension sections relevant to the selected mode(s), except `full`, which covers all dimensions and marks inapplicable dimensions Not assessed.
-- Every dimension section must include a coverage note, findings table or no-findings card, and verified checklist.
-- Include sidebar nav links for every generated section.
-- Do not leave placeholder variables or example data.
+- 读取 `templates/audit-report.html`。
+- 生成完整、自包含的 HTML。
+- 精确保留模板中的 CSS、section 结构、class 和排序。
+- 只包含与所选模式相关的评分项和维度章节；`full` 例外，它覆盖所有维度，并将不适用维度标记为 Not assessed。
+- 每个维度章节必须包含覆盖说明、发现表或“无发现”卡片，以及已验证清单。
+- 侧边栏导航必须包含每个已生成章节的链接。
+- 不要留下占位变量或示例数据。
 
-## Coverage Rules
+## 覆盖率规则
 
-Every report must include:
+每份报告必须包含：
 
-- A coverage matrix with one row per selected dimension.
-- Per-dimension coverage: High / Medium / Low / Not assessed.
-- Inspected evidence: files, commands, searches, runtime surfaces, or patterns checked.
-- Exclusions / limits: what was not checked and why.
+- coverage matrix，每个所选维度一行。
+- 每个维度的覆盖程度：High / Medium / Low / Not assessed。
+- 已检查证据：文件、命令、搜索、运行时表面或已检查模式。
+- 排除项/限制：没有检查什么，以及为什么没有检查。
 
-Use `rubrics/coverage.md` to assign coverage confidence.
+使用 `rubrics/coverage.md` 赋予覆盖置信度。
 
-## Lint Rules
+## Lint 规则
 
-For generated file output, run:
+对于生成到文件的报告，运行：
 
 ```bash
 python3 <skill-dir>/scripts/report_lint.py --modes <selected-modes> <report-file>
 ```
 
-Fix lint failures before delivering the report. For `stdout`, apply the same checks manually:
+交付前修复所有 lint 失败。对于 `stdout`，手动执行同等检查：
 
-- No unreplaced placeholders.
-- Required sections exist.
-- Selected dimension sections exist.
-- Markdown finding fields are complete.
-- Severity statistics match detailed findings.
-- No unredacted secrets or private keys appear.
+- 没有未替换的占位符。
+- 必要章节存在。
+- 所选维度章节存在。
+- Markdown finding 字段完整。
+- 严重程度统计与详细发现一致。
+- 没有未脱敏的 secrets 或 private keys。

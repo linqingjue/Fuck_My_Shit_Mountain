@@ -1,74 +1,25 @@
-# Code Consistency Audit Prompt
+# Code Consistency Audit Prompt（代码一致性审计提示词）
 
-Use the fuck-my-shit-mountain skill in **code-consistency mode**.
+使用 fuck-my-shit-mountain skill 的 **code-consistency mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on code style consistency, naming conventions, pattern uniformity, and adherence to the project's own stated conventions.
+## 聚焦范围
 
-## Audit Areas
+检查命名、导入、错误处理、目录组织、格式、模式使用是否一致。只报告会造成误解、重复 bug、维护成本或错误使用的非一致性。
 
-### Naming Conventions
-- Inconsistent casing (camelCase vs snake_case vs kebab-case) within the same language.
-- Abbreviations used inconsistently (e.g., `idx` vs `index`, `cfg` vs `config`, `msg` vs `message`).
-- Names that obscure meaning (single-letter variables beyond loop counters, overly generic names like `data`, `info`, `temp`).
-- Function/method names that don't describe what they do (side effects not reflected in name).
-- Boolean parameters that are meaningless at call site (e.g., `process(true, false)` without named params/struct).
+## 审计区域
 
-### Import / Module Organization
-- Import groups not following project convention (stdlib → third-party → internal).
-- Wildcard imports that pollute namespace (`use module::*`, `from module import *`).
-- Circular dependencies between modules.
-- Files/modules that import from deep/generic paths instead of the public API.
+- 同一概念是否有多种命名，或同一名称表达不同概念。
+- 错误处理、日志、返回值、异常、状态码是否风格分裂。
+- 导入路径、模块分层、文件命名是否混乱。
+- 同类功能是否有多套实现模式。
+- 配置、常量、工具函数是否散落。
+- 格式化和 lint 是否能自动约束一致性。
 
-### Error Handling Consistency
-- Mix of error return patterns (e.g., exceptions in some paths, error codes in others).
-- Inconsistent error type usage (string errors vs typed errors vs Result/Option).
-- Some functions return `null`/`nil`/`None` for errors while others throw.
-- Different parts of the codebase use different logging patterns for similar situations.
+## 规则
 
-### Pattern Uniformity
-- Similar operations done different ways across the codebase (e.g., HTTP clients constructed inline vs injected).
-- Configuration access patterns vary (env vars read directly vs through a config object).
-- Same data transformation duplicated with slightly different implementations.
-- Inconsistent use of language features (e.g., async/await mixed with raw promises/callbacks).
-
-### File / Directory Structure
-- Files that don't follow the project's naming convention.
-- Misplaced files (utility function in a domain-specific module, or vice versa).
-- Files in the wrong directory layer (e.g., infrastructure code in domain layer).
-- N+1 files doing essentially the same thing in slightly different ways.
-
-### Boilerplate / Verbosity
-- Repeated patterns that could be extracted (same validation appearing in N handlers).
-- Manual serialization/deserialization where a library/framework handles it elsewhere.
-- Copy-paste code that differs only in variable names.
-
-## Rules
-
-1. Focus on inconsistencies that create **real maintenance cost**, not aesthetic preferences.
-2. A single inconsistent file is noise; a pattern of inconsistency across 5+ locations is a finding.
-3. Do NOT suggest a full codebase reformat — suggest targeted extraction or lint rule additions.
-4. If the project has an existing style guide or linter config, check compliance against it.
-5. Consider whether a `clippy`/`eslint`/`ruff` rule could catch the inconsistency automatically.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Maintainability
-- Status: Confirmed / Suspected
-- Subtype: NamingConvention / ImportOrganization / ErrorHandlingConsistency / PatternUniformity / FileStructure / Boilerplate
-- Evidence:
-  - File(s):
-  - Pattern observed:
-  - Expected convention:
-- Number of occurrences:
-- Why this creates maintenance cost:
-- Minimal fix (extract + unify):
-- Better long-term fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 不要把个人审美当作一致性风险。
+2. 每条发现必须说明不一致会如何导致误用、漏改或缺陷。
+3. 修复建议优先使用自动化工具、命名表、约定文档和小步归一。
+4. 每条发现都要包含验证方式，例如 lint rule、搜索检查、单测或代码审查清单。

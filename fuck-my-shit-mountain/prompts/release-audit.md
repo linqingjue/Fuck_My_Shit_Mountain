@@ -1,98 +1,26 @@
-# Release Audit Prompt
+# Release Audit Prompt（发布审计提示词）
 
-Use the fuck-my-shit-mountain skill in **release mode**.
+使用 fuck-my-shit-mountain skill 的 **release mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on whether this project can be safely released, installed, upgraded, and rolled back.
+## 聚焦范围
 
-## Audit Areas (see principles 9.1–9.3: Configuration & Environment)
+检查项目是否具备可重复、可验证、可回滚、可诊断的发布能力。只报告会影响真实发布可靠性的风险。
 
-### CI/CD Pipeline
-- What checks run in CI? (lint, typecheck, test, build, security scan)
-- Are there gates before merge? Before release?
-- Build matrix (OS, architecture, language version)
-- Artifact caching and reproducibility
-- CI speed — does it discourage frequent releases?
+## 审计区域
 
-### Versioning
-- Version scheme (semver, date-based, commit-based)
-- Version defined where and how
-- Pre-release handling (alpha, beta, rc)
-- Version bump automation
-- Breaking change detection
-- Changelog generation
+- 构建流程：是否可重复、是否依赖本机隐式状态、是否有锁定工具链。
+- CI/CD：是否覆盖测试、lint、类型检查、构建、制品验证。
+- 版本管理：版本号、迁移、兼容性、变更日志是否清楚。
+- 配置与环境：开发、测试、生产环境是否隔离，默认值是否安全。
+- 回滚与恢复：失败发布是否能回滚，数据库/状态迁移是否可恢复。
+- 制品与部署：制品来源、校验、签名、SBOM、发布权限是否清楚。
+- 运行前检查：健康检查、告警、日志、runbook 是否支持上线判断。
 
-### Build & Artifacts
-- Build script correctness and determinism
-- Dependency vendoring or lockfile
-- Artifact naming and storage
-- Checksum / signature generation
-- SBOM generation
-- Binary / package provenance
+## 规则
 
-### Installation
-- Install script safety (no curl-bash without verification)
-- Package manager registration (npm, cargo, pip, docker)
-- Minimum supported version documentation
-- Dependency resolution and conflicts
-- First-run experience
-
-### Upgrade Path
-- Data migration (schema, config, state format)
-- Backward compatibility period
-- Deprecation policy
-- Config file format migration
-- State / database migration rollback
-
-### Rollback
-- Can a release be rolled back?
-- Is the previous artifact available?
-- Data migration reversibility
-- Config migration reversibility
-- Rollback testing
-
-### Deployment
-- Dockerfile quality (multi-stage, layer caching, non-root user)
-- Service definition (systemd, launchd, kubernetes)
-- Environment variable configuration
-- Health check endpoint
-- Startup probe, readiness probe, liveness probe
-- Resource limits
-
-### Compatibility
-- API versioning strategy
-- Breaking change communication
-- Documentation of compatibility guarantees
-- Deprecation notice period
-
-## Rules
-
-1. Focus on practical release risks, not hypothetical edge cases.
-2. For each issue, include the user impact and a specific validation step.
-
-## Attitude
-
-1. **Be exhaustively systematic.** Check in-scope CI steps, release scripts, environment requirements, config files, packaging, rollback, and deployment evidence. Follow the skill's coverage strategy and document exclusions honestly.
-2. **Do not be a yes-man.** Report release risks even if the user says "we've never had a problem." Past success does not guarantee future safety.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Release
-- Status: Confirmed / Suspected
-- Affected area:
-- Evidence:
-  - File:
-  - Function / Module:
-  - Relevant behavior:
-- Release risk:
-- User impact:
-- Minimal fix:
-- Better release process:
-- Validation step:
-- Estimated effort:
+1. 每条发布发现都必须说明它如何造成发布失败、回滚困难或线上不可诊断。
+2. 不要因为缺少企业级流程就报问题；只在项目规模和风险需要时报告。
+3. 修复建议优先包括自动化检查、最小发布门禁、回滚步骤和文档补齐。
+4. 每条发现都要包含验证方式，例如 CI job、dry-run、部署演练或回滚演练。

@@ -1,81 +1,26 @@
-# Observability Audit Prompt
+# Observability Audit Prompt（可观测性审计提示词）
 
-Use the fuck-my-shit-mountain skill in **observability mode**.
+使用 fuck-my-shit-mountain skill 的 **observability mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on whether operators can understand, debug, and recover the system under realistic production failures.
+## 聚焦范围
 
-## Audit Areas
+检查系统出现问题时是否能被及时发现、定位和处理。只报告会导致故障不可见、不可诊断或不可恢复的可观测性缺口。
 
-### Logging
-- Missing logs on critical state transitions, failures, and security-sensitive operations.
-- Unstructured logs where structured fields are needed for search and correlation.
-- Logs that lack request ID, trace ID, user/account ID, job ID, or operation name.
-- Error logs that lose cause, stack, or relevant context.
-- Sensitive data logged in clear text.
+## 审计区域
 
-### Metrics
-- No metrics for request volume, latency, error rate, saturation, queue depth, or worker lag.
-- Counters used where histograms/gauges are needed, or vice versa.
-- High-cardinality labels that can overload the metrics backend.
-- Business-critical events with no measurable success/failure signal.
-- No SLO-oriented metrics for user-visible workflows.
+- 日志：是否有结构化日志、关联 ID、关键上下文、敏感信息脱敏。
+- 指标：是否覆盖请求量、错误率、延迟、队列积压、资源使用、业务关键指标。
+- 追踪：跨服务、异步任务、外部依赖调用是否可串联。
+- 健康检查：readiness、liveness、依赖检查是否区分清楚。
+- 告警：是否可行动，阈值是否合理，是否避免噪声。
+- Runbook：关键告警是否有排查和恢复步骤。
+- 调试面：诊断信息是否足够，同时不会泄露敏感数据。
 
-### Tracing and Correlation
-- Request or job lifecycle cannot be followed across process/module boundaries.
-- Background tasks lose correlation context.
-- External calls lack span/operation labels.
-- No correlation ID in client-facing errors or server logs.
-- Distributed traces include too much irrelevant data and hide the failure path.
+## 规则
 
-### Health and Readiness
-- Health checks only prove the process is alive, not that dependencies are usable.
-- Readiness checks do not reflect database/cache/message broker availability.
-- Liveness checks can restart a process during long but healthy work.
-- Startup probes do not account for migrations, warmup, or dependency initialization.
-- No degradation signal when optional dependencies are unavailable.
-
-### Alerting and Runbooks
-- No alertable signal for critical failure modes.
-- Alerts fire on symptoms with no actionable context.
-- Missing runbook links or remediation steps for production alerts.
-- Alert thresholds are static guesses and not tied to user impact.
-- No escalation path for data loss, security, or availability incidents.
-
-### Debuggability
-- Error responses lack a safe correlation handle for support.
-- CLI/admin tooling cannot inspect queues, stuck jobs, or state transitions.
-- Feature flags or config changes cannot be audited.
-- No way to reproduce or replay failed background work.
-- Diagnostic endpoints expose sensitive data or lack authorization.
-
-## Rules
-
-1. Observability findings must describe the failure that would be hard to detect or debug.
-2. Do not require enterprise telemetry for small projects; scale recommendations to the deployment model.
-3. Prefer low-overhead instrumentation at boundaries: requests, jobs, external calls, persistence, and critical state transitions.
-4. Treat logging sensitive data as a security finding as well as an observability problem.
-5. For each issue, include the signal that should exist and where it should be emitted.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Stability / Release / Security
-- Status: Confirmed / Suspected
-- Subtype: Logging / Metrics / Tracing / HealthCheck / Alerting / Runbook / Debuggability
-- Affected area:
-- Evidence:
-  - File:
-  - Function / Module:
-  - Relevant behavior:
-- Missing or unsafe signal:
-- Why this matters:
-- Realistic failure scenario:
-- Minimal fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 每条发现都要说明缺少哪个信号，以及故障发生时会怎样拖慢定位。
+2. 不要把“没有接入某个具体平台”当作问题；关注信号本身。
+3. 日志建议必须同时考虑隐私和 secret 脱敏。
+4. 修复建议应给出具体日志字段、指标名、trace 边界、告警条件或 runbook 条目。

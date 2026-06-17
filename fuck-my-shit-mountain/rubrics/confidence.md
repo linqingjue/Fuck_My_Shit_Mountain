@@ -1,53 +1,55 @@
-# Confidence Rubric
+# Confidence Rubric（置信度标准）
+
+> 标签名保留英文，便于模板、lint 和报告统计稳定工作。
 
 ## High
 
-- The finding is directly observed in the code.
-- The evidence includes a specific code path, function, or configuration.
-- The failure scenario can be reproduced or clearly traced.
-- The issue is confirmed by a test failure or runtime behavior.
-- No ambiguity in interpretation — the code does what the finding describes.
+- 发现可以在代码中直接观察到。
+- 证据包含具体代码路径、函数或配置。
+- 失败场景可以复现或清楚追踪。
+- 问题被测试失败或运行时行为确认。
+- 解释没有歧义：代码确实做了发现中描述的事情。
 
-### When to use
+### 何时使用
 
-- You have read the relevant code and can point to exact lines.
-- You have traced a control flow and identified a bug.
-- You have tested the behavior and confirmed the issue.
-- The code has a `TODO`, `FIXME`, `HACK`, or `SAFETY` comment indicating known risk.
+- 已阅读相关代码，并能指向精确行号。
+- 已追踪控制流并确认 bug。
+- 已测试行为并确认问题。
+- 代码中的 `TODO`、`FIXME`、`HACK` 或 `SAFETY` 注释表明已知风险。
 
 ## Medium
 
-- The finding is inferred from code patterns, not directly observed.
-- The evidence points to a code area but the exact trigger is unclear.
-- The issue depends on external factors (OS, network, load).
-- The code follows a pattern that is commonly dangerous.
-- You have moderate confidence that the issue is real but lack reproduction.
+- 发现来自代码模式推断，而不是直接观察。
+- 证据指向某个代码区域，但确切触发条件不清楚。
+- 问题依赖外部因素，例如 OS、网络、负载。
+- 代码使用了常见危险模式。
+- 有中等把握认为问题真实存在，但尚未复现。
 
-### When to use
+### 何时使用
 
-- The pattern matches known anti-patterns but you have not tested it.
-- Error handling is missing but you cannot confirm it causes real failures.
-- A dependency has known vulnerabilities but the usage surface is small.
-- The logic is hard to follow and likely incorrect, but not proven.
+- 模式符合已知反模式，但尚未测试。
+- 错误处理缺失，但不能确认会造成真实失败。
+- 依赖存在已知漏洞，但使用面较小。
+- 逻辑难以理解且可能错误，但未证明。
 
 ## Low
 
-- The finding is speculative.
-- The evidence is weak or indirect.
-- The issue depends on unlikely conditions or configurations.
-- You are inferring risk from naming or structure without reading the full flow.
-- The code looks unusual but may be intentional.
+- 发现具有推测性。
+- 证据较弱或间接。
+- 问题依赖不太可能发生的条件或配置。
+- 只是从命名或结构推断风险，未读完整流程。
+- 代码看起来异常，但可能是有意设计。
 
-### When to use
+### 何时使用
 
-- You have not fully read the relevant code.
-- The finding is based on file size, structure, or naming only.
-- The risk depends on future scale or usage patterns.
-- You want to flag an area for human review.
+- 尚未完整阅读相关代码。
+- 发现仅基于文件大小、结构或命名。
+- 风险依赖未来规模或使用方式。
+- 只是希望提示人工复核某个区域。
 
-## Guidelines
+## 指南
 
-- If you are not sure, use **Medium** or **Low**, not **High**.
-- Be conservative. It is better to under-state confidence than over-state it.
-- If the confidence is Low, consider whether the finding is worth reporting at all. Low-confidence issues should be rare.
-- A finding can have different confidence levels for different aspects. State the confidence for the core claim.
+- 不确定时使用 **Medium** 或 **Low**，不要使用 **High**。
+- 保守判断。低估置信度通常比高估更安全。
+- 如果置信度为 Low，先判断是否值得报告。低置信度问题应当少见。
+- 同一发现的不同方面可以有不同置信度；报告核心主张的置信度。
