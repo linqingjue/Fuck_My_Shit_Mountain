@@ -1,68 +1,26 @@
-# Documentation Audit Prompt
+# Documentation Audit Prompt（文档审计提示词）
 
-Use the fuck-my-shit-mountain skill in **documentation mode**.
+使用 fuck-my-shit-mountain skill 的 **documentation mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on whether external docs, internal docs, setup instructions, and operational guidance match the code and reduce real delivery risk.
+## 聚焦范围
 
-## Audit Areas
+检查文档是否真实、可执行、可维护，并且是否帮助用户、开发者和运维人员正确使用项目。不要把“文档少”本身当作问题，除非它会导致实际风险。
 
-### User and Operator Documentation
-- README or docs describe commands, behavior, config, or APIs that no longer match code.
-- Missing setup, install, upgrade, rollback, or deployment steps.
-- Missing troubleshooting guidance for known failure modes.
-- Operational docs lack health checks, alert handling, backup/restore, or incident response steps.
+## 审计区域
 
-### Developer Documentation
-- No architecture overview for non-obvious module boundaries.
-- Missing contribution, test, build, or local environment instructions.
-- Generated code, migrations, or scripts have no safe usage notes.
-- Public extension/plugin APIs lack examples and compatibility expectations.
+- README：安装、启动、配置、测试、构建说明是否能按步骤跑通。
+- 用户文档：功能行为、限制、错误处理是否准确。
+- 开发者文档：本地开发、测试、架构、目录结构、贡献流程是否清楚。
+- 运维文档：部署、回滚、告警、故障处理、备份恢复是否可执行。
+- API 文档：契约、参数、响应、错误码、示例是否与代码一致。
+- 决策记录：重要架构取舍是否有 ADR 或等价记录。
+- 过期文档：文档是否与实际代码、配置、命令、依赖版本冲突。
 
-### API and Contract Documentation
-- Endpoint, CLI, event, or config docs diverge from implemented contracts.
-- Error responses, status codes, and auth requirements are not documented.
-- Versioning and deprecation policy is missing.
-- Examples use fields or payloads that the code no longer accepts.
+## 规则
 
-### Decision Records
-- Major tradeoffs are implicit and hard to rediscover.
-- ADRs are missing for persistence, auth, concurrency, deployment, or public API choices.
-- Old decisions remain documented after the implementation changes.
-- Risky constraints have no documented mitigation or owner.
-
-### Documentation Maintenance
-- Docs duplicate source-of-truth data that could be generated.
-- Stale badges, version numbers, feature lists, or screenshots.
-- Comments and docs disagree with each other.
-- No docs check in CI for generated or schema-derived docs.
-
-## Rules
-
-1. Documentation findings must compare docs against actual code or release behavior.
-2. Prioritize misleading docs over missing docs.
-3. Do not require heavyweight docs for a small private project unless missing guidance creates real risk.
-4. Prefer linking docs to generated schemas/contracts when possible.
-5. Include the exact doc location and the code/config it contradicts.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Maintainability / Release / Testing
-- Status: Confirmed / Suspected
-- Subtype: UserDocs / OperatorDocs / DeveloperDocs / ApiDocs / DecisionRecord / StaleDocs
-- Affected area:
-- Evidence:
-  - Documentation file:
-  - Code / config source:
-  - Relevant mismatch or omission:
-- Problem:
-- Realistic failure scenario:
-- Minimal fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 文档发现必须指出“文档与实际行为的差异”或“缺失文档会造成的具体风险”。
+2. 不要泛泛要求补文档；要说明应该补在哪里、补什么、用于谁。
+3. 对过期说明要给出代码或配置证据。
+4. 每条发现都要包含验证方式，例如按文档执行命令、对照 API、运行示例或检查部署流程。
