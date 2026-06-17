@@ -1,72 +1,26 @@
-# Privacy and Data Governance Audit Prompt
+# Privacy and Data Governance Audit Prompt（隐私与数据治理审计提示词）
 
-Use the fuck-my-shit-mountain skill in **privacy mode**.
+使用 fuck-my-shit-mountain skill 的 **privacy mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on personal data handling, data minimization, retention, deletion, export, logging, access boundaries, and privacy-relevant governance.
+## 聚焦范围
 
-## Audit Areas
+检查项目是否正确识别、最小化、保护、保留、删除和导出个人数据或敏感数据。只报告有证据支撑的数据治理风险。
 
-### Data Inventory and Classification
-- PII or sensitive data collected without a clear purpose.
-- Personal data fields stored without classification or ownership.
-- Sensitive fields copied into analytics, logs, caches, queues, or exports.
-- Test fixtures or examples contain realistic personal data.
-- Derived identifiers can re-identify users.
+## 审计区域
 
-### Data Minimization
-- Collecting or persisting fields not needed for current behavior.
-- Sending full records where only IDs or aggregates are needed.
-- Retaining raw payloads after extraction.
-- Third-party integrations receive unnecessary user data.
-- Debug/admin tools expose full records by default.
+- DataInventory：是否能识别 PII、敏感数据、派生数据和日志数据。
+- Minimization：是否收集或存储了不必要的数据。
+- AccessBoundary：访问控制、审计日志、内部工具权限是否过宽。
+- Retention：是否有保留期限，以及是否真正执行。
+- Deletion：删除是否覆盖缓存、索引、备份、派生数据和外部系统。
+- Export：导出是否完整、边界清晰、不会泄露他人数据。
+- TelemetryPrivacy：日志、指标、trace、错误上报是否脱敏。
 
-### Consent, Access, and Purpose Boundaries
-- Privacy-sensitive processing has no user/account-level gate.
-- Internal roles can access more data than their job requires.
-- Admin or support tooling lacks audit logs.
-- Data is reused across features without a clear purpose boundary.
-- Tenant/account boundaries are not enforced in privacy-sensitive queries.
+## 规则
 
-### Retention, Deletion, and Export
-- No retention period for logs, events, uploads, or backups.
-- Delete requests do not remove derived data, caches, queues, or search indexes.
-- Export misses important user data or includes other users' data.
-- Backups make deletion guarantees misleading.
-- Retention config differs from documented policy.
-
-### Privacy in Logs and Telemetry
-- PII appears in logs, traces, metrics labels, crash reports, or error responses.
-- High-cardinality labels contain user identifiers.
-- Correlation IDs can be linked to personal data without controls.
-- Third-party telemetry SDKs send sensitive context by default.
-
-## Rules
-
-1. Privacy findings must identify the personal or sensitive data involved.
-2. Do not cite legal compliance obligations unless the project explicitly targets that regime; describe engineering risk instead.
-3. Treat PII in logs as both privacy and security risk.
-4. Prefer data minimization, redaction, access control, retention config, and audit trails over broad rewrites.
-5. If no personal data is processed, mark the mode Not assessed or Info with evidence.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Security / Stability / Release
-- Status: Confirmed / Suspected
-- Subtype: DataInventory / Minimization / AccessBoundary / Retention / Deletion / Export / TelemetryPrivacy
-- Affected data:
-- Evidence:
-  - File:
-  - Function / Module:
-  - Relevant behavior:
-- Problem:
-- Realistic privacy failure scenario:
-- Minimal fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 每条隐私发现必须说明涉及的数据类别和流转位置。
+2. 不要臆测法规适用性；如涉及合规，只描述工程风险和需要法务确认的点。
+3. 不要打印完整敏感数据，只引用路径、字段名和脱敏证据。
+4. 每条发现都要包含具体缓解措施和验证方式。
