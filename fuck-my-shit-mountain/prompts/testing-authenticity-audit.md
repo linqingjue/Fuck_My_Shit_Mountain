@@ -1,74 +1,23 @@
-# Testing Authenticity Audit Prompt
+# Testing Authenticity Audit Prompt（测试真实性审计提示词）
 
-Use the fuck-my-shit-mountain skill in **testing-authenticity mode**.
+使用 fuck-my-shit-mountain skill 的 **testing-authenticity mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on whether tests provide **real confidence** or just green checkmarks. This is not about coverage percentage — it is about whether the tests would catch real bugs.
+## 聚焦范围
 
-## Audit Areas
+判断测试是否真的能防止回归，而不是制造“看起来有测试”的虚假安全感。
 
-### Over-Mocking
-- Tests that mock everything except the exact function being tested.
-- Mocks that return canned data and never exercise real behavior.
-- Mock assertions that verify the mock was called (testing the mock framework, not the code).
-- Mock setups that are more complex than the code under test.
+## 审计区域
 
-### Testing Implementation, Not Behavior
-- Tests that assert on internal state, private methods, or intermediate values.
-- Tests that break on refactoring that does not change external behavior.
-- Tests that know too much about how a function works internally.
-- Snapshot tests that capture irrelevant output.
+- Valuable Tests：真正覆盖关键行为、边界、错误路径和集成边界的测试。
+- Suspicious Tests：过度 mock、只测实现细节、只测 happy path、断言无意义、依赖执行顺序的测试。
+- Missing Tests：关键风险路径没有测试覆盖。
+- False Confidence：覆盖率高但关键行为未被验证。
 
-### Production Code Modified for Tests
-- `if (isTest)` / `if (env === 'test')` branches in production code.
-- Special constructors, setters, or config paths only used by tests.
-- `#[cfg(test)]` / `if __name__ == '__main__'` that changes production behavior.
-- Mock/injector frameworks that require production code to accept injected dependencies it otherwise would not need.
+## 规则
 
-### Happy-Path-Only Tests
-- Tests that only verify the success case.
-- No tests for: invalid input, network error, auth failure, empty data, concurrent access.
-- Error paths that return `Ok` are never tested with actual `Err` conditions.
-
-### Brittle Tests
-- Tests that depend on exact string matching of error messages.
-- Tests that depend on timing, ordering, or random data.
-- Tests that depend on specific dates or environment variables.
-- Tests that fail when run in a different order.
-
-### False Confidence
-- 100% line coverage with no assertion on behavior (only that "no crash").
-- Integration tests that start a server but never send realistic requests.
-- Tests that pass with a broken implementation because the mock is too permissive.
-- Property-based tests with trivial generators that never produce edge cases.
-
-## Rules
-
-1. A test that never fails is not a good test — it is a test that never catches bugs.
-2. If production code has test-only branches, that is a design smell. Tests should exercise production paths, not create special ones.
-3. Over-mocked tests test the mock, not the code. Reduce mock scope or write integration tests.
-4. Snapshot tests are not free — each one is a maintenance liability.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Testing
-- Status: Confirmed / Suspected
-- Subtype: OverMocked / ImplDetail / ProdCodeForTest / HappyPathOnly / Brittle / FalseConfidence
-- Affected area:
-- Evidence:
-  - Test file:
-  - Production file (if test-specific logic):
-  - Test function:
-  - What it actually tests vs what it should test:
-- Problem:
-- Why it produces false confidence:
-- Recommended action: Rewrite / Delete / Keep but augment / Move to integration
-- Minimal fix:
-- Suggested replacement test:
-- Estimated effort:
+1. 每条发现必须说明现有测试为什么不能防住某类真实 bug。
+2. 不要嘲笑测试；客观说明它提供了什么信心、缺了什么信心。
+3. 对每个可疑测试给出 Keep / Rewrite / Delete 建议。
+4. 每条发现都要包含具体替代测试建议。
