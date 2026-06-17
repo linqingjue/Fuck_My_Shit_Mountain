@@ -1,61 +1,61 @@
-# Evidence Rubric
+# Evidence Rubric（证据标准）
 
-## What Counts as Evidence
+## 什么算证据
 
 | Type | Example | Weight |
 |------|---------|--------|
-| Direct code observation | Line 42 calls `unwrap()` on a user-controlled value | Strong |
-| Traceable control flow | Request path A → function B → branch C has no error handling | Strong |
-| Runtime behavior | Test fails when input is empty | Strong |
+| Direct code observation | 第 42 行对用户可控值调用 `unwrap()` | Strong |
+| Traceable control flow | 请求路径 A → 函数 B → 分支 C 没有错误处理 | Strong |
+| Runtime behavior | 输入为空时测试失败 | Strong |
 | Config inspection | `app.config.secret = "hardcoded-dev-key"` | Strong |
-| Dependency audit | Dependency v1.2.3 has CVE-2024-XXXX with public exploit | Strong |
+| Dependency audit | 依赖 v1.2.3 存在 CVE-2024-XXXX 且有公开 exploit | Strong |
 | Comment indicating risk | `// TODO: this can deadlock under load` | Strong |
-| Pattern inference | All handlers use `String::from_utf8_unchecked` | Medium |
-| Structural inference | File is 3000 lines with 20 public functions | Medium |
-| Missing pattern | No test file exists for `auth.rs` | Weak |
-| Name-based inference | Function named `doStuff()` suggests unclear responsibility | Weak |
+| Pattern inference | 所有 handler 都使用 `String::from_utf8_unchecked` | Medium |
+| Structural inference | 文件 3000 行且包含 20 个 public function | Medium |
+| Missing pattern | `auth.rs` 没有对应测试文件 | Weak |
+| Name-based inference | 函数名 `doStuff()` 暗示职责不清 | Weak |
 
-## Evidence Requirements by Severity
+## 按严重程度的最低证据要求
 
 | Severity | Minimum Evidence |
 |----------|-----------------|
-| Critical | Direct code observation OR runtime behavior confirmation |
-| High | Direct code observation OR traceable control flow |
-| Medium | Direct code observation OR pattern inference |
-| Low | Pattern inference OR structural inference |
-| Info | Any |
+| Critical | Direct code observation 或 runtime behavior confirmation |
+| High | Direct code observation 或 traceable control flow |
+| Medium | Direct code observation 或 pattern inference |
+| Low | Pattern inference 或 structural inference |
+| Info | 任意证据 |
 
-## Evidence Requirements by Confidence
+## 按置信度的最低证据要求
 
 | Confidence | Minimum Evidence |
 |------------|-----------------|
-| High | Direct code observation or traceable control flow |
-| Medium | Pattern inference or config inspection |
-| Low | Structural inference or missing patterns |
+| High | Direct code observation 或 traceable control flow |
+| Medium | Pattern inference 或 config inspection |
+| Low | Structural inference 或 missing patterns |
 
-## What Does NOT Count as Evidence
+## 什么不算证据
 
-- "This looks bad" without explanation.
-- "This is not idiomatic" — style alone is not evidence.
-- "This might be slow" without identifying a bottleneck.
-- "This is not scalable" without identifying the scaling limit.
-- Personal preference about naming, formatting, or structure.
-- Complaints about code not matching the reviewer's preferred paradigm.
-- Assumptions about the developer's intent.
+- 只有“看起来不好”，但没有解释。
+- “不够 idiomatic”——单纯风格不是证据。
+- “可能很慢”，但没有指出瓶颈。
+- “不可扩展”，但没有指出扩展上限。
+- 对命名、格式或结构的个人偏好。
+- 抱怨代码不符合审查者偏好的范式。
+- 对开发者意图的假设。
 
-## Evidence Format
+## 证据格式
 
-Every evidence block MUST include:
+每个 evidence block 必须包含：
 
+```text
+- File: <带行号的路径>
+- Function / Module: <具体函数或模块名>
+- Relevant behavior: <代码实际做了什么>
 ```
-- File: <path with line numbers>
-- Function / Module: <specific function or module name>
-- Relevant behavior: <what the code actually does>
-```
 
-Optional but recommended:
+建议补充：
 
-```
+```text
 - Input / state that triggers the behavior:
 - Expected vs actual behavior:
 - Test that demonstrates the issue:
