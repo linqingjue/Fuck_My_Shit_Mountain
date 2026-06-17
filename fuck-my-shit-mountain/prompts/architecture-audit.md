@@ -1,73 +1,49 @@
-# Architecture Audit Prompt
+# Architecture Audit Prompt（架构审计提示词）
 
-Use the fuck-my-shit-mountain skill in **architecture mode**.
+使用 fuck-my-shit-mountain skill 的 **architecture mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on module boundaries, dependency direction, layering, ownership, and whether the system shape supports safe change.
+## 聚焦范围
 
-## Audit Areas
+只关注会影响演进能力、边界清晰度和变更风险的架构问题，不要把普通代码风格问题包装成架构问题。
 
-### Module Boundaries
-- Modules with unclear ownership or overlapping responsibilities.
-- Domain logic spread across UI, API handlers, database adapters, and scripts.
-- "Utils" or "common" modules that hide unrelated behavior.
-- Public APIs exposing implementation details.
-- Cross-layer imports that bypass intended boundaries.
+## 审计区域
 
-### Dependency Direction
-- High-level policy depending directly on low-level infrastructure.
-- Circular imports or package cycles.
-- Feature modules depending on unstable internals from other features.
-- Test-only architecture seams leaking into production design.
-- Global singletons used instead of explicit dependencies.
+### 模块边界
+- 模块职责是否清楚？
+- 是否存在“什么都管”的大模块？
+- 是否有跨层直接访问导致边界失效？
 
-### Data and State Ownership
-- Multiple modules mutating the same state without a clear owner.
-- Ambiguous source of truth for cached/derived data.
-- Shared mutable state crossing async/thread/process boundaries.
-- Persistence models reused as API or UI models where that creates coupling.
-- State transitions implemented in multiple places.
+### 依赖方向
+- 业务层是否依赖基础设施细节？
+- 是否存在循环依赖或隐式双向依赖？
+- 抽象是否只为抽象而抽象，还是确实降低了变更成本？
 
-### Boundary Contracts
-- Missing contracts between layers, packages, services, or plugins.
-- Implicit serialization formats or event payloads.
-- Adapters that do validation/business logic inconsistently.
-- Backward compatibility assumptions not documented or enforced.
-- Runtime feature discovery where explicit interfaces would be safer.
+### 状态所有权
+- 每类状态是否有明确 source of truth？
+- 缓存、UI 状态、数据库状态之间是否可能不一致？
+- 是否存在多个模块同时写同一关键状态？
 
-### Evolution and Extensibility
-- Adding a feature requires editing many unrelated modules.
-- Extension points are too generic or too rigid.
-- Architecture decisions are encoded only in tribal knowledge.
-- Dead abstractions with one implementation and no realistic second use.
-- Migration paths between old and new architecture are unclear.
+### 边界契约
+- API、事件、配置、持久化结构是否有明确 schema 或 contract？
+- 边界输入是否校验？错误是否可诊断？
 
-## Rules
+### 演进风险
+- 新增功能会不会牵连大量无关模块？
+- 是否存在难以测试、难以替换、难以灰度的核心路径？
 
-1. Judge architecture relative to project size and release stage.
-2. Do not recommend rewrites unless local boundary repairs are clearly insufficient.
-3. Cite concrete dependency paths, import cycles, state owners, or change scenarios.
-4. Prefer small moves: introduce an interface, move validation to a boundary, split one module, or invert one dependency.
-5. If a design is simple and works for the scale, do not over-architect it.
+## 规则
 
+1. 每条架构发现必须说明具体变更风险，而不是抽象评价“架构不好”。
+2. 不要轻易建议重写；优先给出局部拆分、依赖倒置、边界收口、状态归属澄清等最小修复。
+3. 如果当前规模下某设计虽然不优雅但足够简单，要明确说“不构成当前风险”。
+4. 每条发现都要包含回归测试或架构保护测试建议。
 
-## Finding Format
+## Finding 分类建议
 
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Maintainability / Design / Stability
-- Status: Confirmed / Suspected
-- Subtype: ModuleBoundary / DependencyDirection / StateOwnership / BoundaryContract / EvolutionRisk
-- Affected area:
-- Evidence:
-  - File:
-  - Function / Module:
-  - Relevant behavior:
-- Problem:
-- Realistic change scenario:
-- Minimal fix:
-- Regression test suggestion:
-- Estimated effort:
+- ModuleBoundary
+- DependencyDirection
+- StateOwnership
+- BoundaryContract
+- EvolutionRisk
