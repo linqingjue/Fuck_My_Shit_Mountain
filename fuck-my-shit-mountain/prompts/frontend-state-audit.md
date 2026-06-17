@@ -1,85 +1,27 @@
-# Frontend State Audit Prompt
+# Frontend State Audit Prompt（前端状态审计提示词）
 
-Use the fuck-my-shit-mountain skill in **frontend-state mode**.
+使用 fuck-my-shit-mountain skill 的 **frontend-state mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on frontend state management, component architecture, and UI data flow. This mode is for projects with a browser/client-side UI.
+## 聚焦范围
 
-## Audit Areas
+检查前端状态是否清晰、单一、可预测，并且不会造成 UI 与真实业务状态不一致。若项目没有前端界面，应标记 Not assessed。
 
-### Component Size
-- Single-file components over 400 lines.
-- Components that handle data fetching, transformation, rendering, and event handling.
-- Components with too many responsibilities (SRP violation for UI).
-- Render functions/methods over 100 lines.
+## 审计区域
 
-### State Duplication and Sync
-- Same data stored in multiple stores or component state.
-- Manual sync between URL params, store state, and component local state.
-- `props` that duplicate data already available in a store.
-- State that is derived but stored instead of computed.
+- ComponentSize：组件是否过大，混合渲染、数据获取、业务规则和副作用。
+- StateDuplication：同一状态是否在多个位置重复保存。
+- PropDrilling：状态传递是否让边界和所有权变得模糊。
+- EffectChain：effect 是否形成隐式执行链，导致竞态或难以测试。
+- UIBusinessCoupling：业务规则是否散落在 UI 组件中。
+- DOMasState：是否把 DOM 当成真实状态来源。
+- RequestState：加载、错误、取消、陈旧响应是否处理正确。
+- RenderPerf：大列表、频繁渲染、昂贵计算是否缺少边界。
 
-### Prop Drilling
-- Props passed through 3+ levels of components without consumption.
-- Components that accept 7+ props (suggests missing composition).
-- "Wrapper" components that exist only to pass props through.
+## 规则
 
-### Effect / Watch / Listener Proliferation
-- `useEffect` / `watch` / `computed` chains that trigger each other.
-- Effects that fetch data based on state that other effects modify.
-- Missing cleanup in effects/subscriptions.
-- Polling intervals that are not cleared on unmount.
-
-### UI-Business Logic Coupling
-- API calls inside component event handlers instead of store/services.
-- Business rules (validation, formatting, filtering) duplicated in UI components.
-- Navigation/routing logic mixed with data fetching.
-- Components that directly mutate store state instead of calling actions.
-
-### DOM-as-State
-- Data read from DOM attributes or DOM text content instead of state/store.
-- Hidden DOM elements used to store data for later access.
-- CSS class names used as state flags.
-- Refs used to store data that should be in state.
-
-### Request State Management
-- Loading/error states tracked manually per component instead of centralized.
-- Race conditions in async requests (response order ≠ request order).
-- No request deduplication (same request fired by multiple components).
-- Optimistic updates without rollback on failure.
-
-### Rendering Performance
-- Large lists without virtualization.
-- Components that re-render when unrelated state changes.
-- Expensive computations in render functions without memoization.
-- Unnecessary context subscriptions.
-
-## Rules
-
-1. Do not recommend a state management library migration unless the current approach is demonstrably causing bugs or severe maintenance pain.
-2. Local component state is fine — not everything needs to be in a global store.
-3. Consider the scale: patterns that are fine at 5 components may break at 50.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Maintainability / Performance
-- Status: Confirmed / Suspected
-- Subtype: ComponentSize / StateDuplication / PropDrilling / EffectChain / UIBusinessCoupling / DOMasState / RequestState / RenderPerf
-- Affected area:
-- Evidence:
-  - File:
-  - Component / Store:
-  - Relevant behavior:
-- Problem:
-- Why it creates maintenance risk:
-- Recommended action: Split / Lift / Compute / Centralize / Debounce / Virtualize
-- Minimal fix:
-- Better long-term fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 每条发现必须说明具体用户流程或状态不一致场景。
+2. 不要因为用了某个状态库或没用某个状态库而报问题；关注状态所有权和行为。
+3. 修复建议优先包括单一 source of truth、状态提升/下沉、请求状态机、取消与去重。
+4. 每条发现都要包含组件测试、交互测试或状态机测试建议。
