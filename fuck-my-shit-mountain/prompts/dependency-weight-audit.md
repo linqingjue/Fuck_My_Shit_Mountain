@@ -1,74 +1,25 @@
-# Dependency Weight Audit Prompt
+# Dependency Weight Audit Prompt（依赖重量审计提示词）
 
-Use the fuck-my-shit-mountain skill in **dependency-weight mode**.
+使用 fuck-my-shit-mountain skill 的 **dependency-weight mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on whether dependencies are pulling their weight — not just known vulnerabilities, but whether each dependency is justified relative to the project's scale.
+## 聚焦范围
 
-## Audit Areas
+检查依赖是否明显过重、未使用、可内联、引入过大传递依赖或放大构建/运行成本。只报告有证据支撑的依赖重量问题。
 
-### Overweight Dependencies
-- Large frameworks used for a tiny fraction of their capability.
-- Library included for one utility function that could be inlined in 5 lines.
-- Full-featured dependency where a lighter alternative exists.
-- "Kitchen sink" dependencies that pull in transitive deps for unused features.
-- Dependency that duplicates functionality of another included library.
+## 审计区域
 
-### Dependency Count
-- Total number of direct dependencies — is each one justified?
-- Development dependencies that are never used in any script or build step.
-- Dependencies that are only used in one file or one function.
-- Dependencies added for a feature that was later removed (dead dependency).
+- 直接依赖是否真正被使用。
+- 依赖是否只为很小功能引入大量代码或传递依赖。
+- 依赖是否影响 bundle size、启动时间、构建时间、镜像大小或攻击面。
+- 是否存在多个依赖实现同类能力。
+- 是否能用标准库、小函数或已有依赖替代。
+- 依赖维护状态、许可证和安全风险是否影响保留决策。
 
-### Transitive Dependency Risk
-- Deep dependency trees (library → library → library → used for one call).
-- Dependencies with no maintenance activity (stale, no recent releases).
-- Dependencies with known CVEs that are not fixable by bumping version.
-- Native bindings that complicate cross-platform builds.
-- Dependencies with conflicting licenses.
+## 规则
 
-### Build Toolchain Complexity
-- Multiple build systems for the same project.
-- Build scripts longer than the code they compile.
-- Custom build tooling that could be replaced by standard toolchain features.
-- Pre-build / post-install scripts that execute arbitrary code.
-- Docker build stages that download unnecessary dependencies.
-
-### Version Strategy
-- No lockfile committed (cargo.lock, package-lock.json, yarn.lock).
-- Overly permissive version ranges (`*`, `>=`, `^0`).
-- Pinned versions with no upgrade cadence or policy.
-- Duplicate versions of the same dependency (multiple versions in the tree).
-- Git/submodule dependencies that are not pinned to a specific commit.
-
-## Rules
-
-1. Do not recommend removing a dependency unless the removal is realistic and reduces risk.
-2. A "heavy" dependency is acceptable if it is used deeply and consistently.
-3. Developer experience matters — a well-known library may be worth the weight for DX alone.
-4. For each flagged dependency, check: can it be removed, replaced with a lighter alternative, or inlined?
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Release / Performance / Maintainability
-- Status: Confirmed / Suspected
-- Subtype: Overweight / Unused / DeadDependency / TransitiveRisk / ToolchainComplexity / VersionRisk
-- Affected area:
-- Dependency:
-- Evidence:
-  - File (where it is used):
-  - Usage pattern (how much of its API is used):
-  - Bundle / binary size contribution (if measurable):
-- Problem:
-- Why it is a risk:
-- What it provides vs what the project actually needs:
-- Recommended action: Keep / Inline / ReplaceWithLighter / Remove / AuditTransitives
-- Minimal fix:
-- Build / test verification after removal:
-- Estimated effort:
+1. 不要凭印象说某依赖“重”；要给出使用位置、体积、传递依赖或构建影响证据。
+2. 不要为了极致纯净而删除稳定依赖；只有收益超过迁移成本时才建议移除。
+3. 对每个依赖给出 Keep / Inline / Remove / Replace 建议。
+4. 每条发现都要包含验证方式，例如 bundle analyze、依赖树、构建时间对比或测试回归。
