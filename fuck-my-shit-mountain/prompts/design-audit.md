@@ -1,68 +1,26 @@
-# Design Principles Audit Prompt
+# Design Principles Audit Prompt（设计原则审计提示词）
 
-Use the fuck-my-shit-mountain skill in **design mode**.
+使用 fuck-my-shit-mountain skill 的 **design mode**。
 
-Shared setup, coverage, report template, HTML, and lint rules live in `references/report-format.md`; load that reference before producing the report.
+共享设置、覆盖策略、报告模板、HTML 和 lint 规则位于 `references/report-format.md`；生成报告前必须加载该引用。
 
-Focus on practical violations of engineering principles from `rubrics/principles.md` that create correctness, maintainability, or release risk.
+## 聚焦范围
 
-## Audit Areas
+检查代码是否违反会造成真实工程风险的设计原则。不要为了套原则而套原则；只有当原则违背会带来变更风险、缺陷风险、测试困难或边界混乱时才报告。
 
-### Structure and Size Discipline
-- SRP violations in functions, classes, modules, services, or components.
-- Files/functions so large that behavior is hard to test or reason about.
-- Excessive parameters, nesting, or cyclomatic complexity.
-- Multiple unrelated reasons to change one unit.
+## 审计区域
 
-### Coupling and Cohesion
-- Modules that depend on too many unstable internal modules.
-- Law of Demeter violations that couple callers to internal object shape.
-- Concrete infrastructure dependencies inside high-level business logic.
-- Interfaces that force clients to implement methods they do not use.
+- Single Responsibility：职责是否混杂，导致修改一个需求牵连无关逻辑？
+- Open/Closed：新增能力是否只能通过修改核心分支完成？
+- Dependency Inversion：高层策略是否依赖底层实现细节？
+- Fail Fast：非法输入、错误配置、缺失依赖是否被延迟暴露？
+- Explicit Boundaries：模块、API、配置、状态边界是否清楚？
+- Least Privilege：权限、能力、作用域是否过宽？
+- DRY：重复是否会导致行为分叉，而不只是表面重复？
 
-### Naming and Side Effects
-- Names that hide mutation, I/O, network calls, persistence, or expensive work.
-- Queries that also mutate state.
-- Boolean traps and stringly typed state.
-- Misleading abstractions that make failure modes surprising.
+## 规则
 
-### Simplicity and Duplication
-- Accidental duplication of real business rules.
-- Over-engineered patterns without a current need.
-- Abstractions with one implementation and no plausible second use.
-- Complex generic code where a direct solution would reduce risk.
-
-### Error and Boundary Design
-- Invalid inputs traveling deep into the system before failing.
-- Swallowed errors or lost error context.
-- Generic public errors that prevent callers from handling failures.
-- Missing fail-fast checks at external boundaries.
-
-## Rules
-
-1. Load `rubrics/principles.md` and cite exact principle IDs for findings.
-2. Do not report principle violations that are only aesthetic.
-3. Every design finding must explain the concrete change, bug, or test burden it creates.
-4. Prefer local improvements over architecture rewrites.
-5. A principle can be intentionally violated; accept it when the code documents and contains the tradeoff.
-
-
-## Finding Format
-
-### Finding: <short title>
-
-- Severity: Critical / High / Medium / Low / Info
-- Confidence: High / Medium / Low
-- Category: Design / Maintainability / Stability
-- Status: Confirmed / Suspected
-- Principle: <principle name and ID from rubrics/principles.md>
-- Affected area:
-- Evidence:
-  - File:
-  - Function / Module:
-  - Relevant behavior:
-- Problem:
-- Why this creates risk:
-- Minimal fix:
-- Regression test suggestion:
-- Estimated effort:
+1. 每条发现都必须关联 `rubrics/principles.md` 中的原则。
+2. 只报告会产生现实风险的原则违背。
+3. 不要把轻微风格争议包装成设计问题。
+4. 修复建议应优先选择局部边界调整、职责拆分、显式契约、fail-fast 校验等小步方案。
