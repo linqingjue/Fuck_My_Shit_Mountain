@@ -1,52 +1,54 @@
-# Severity Rubric
+# Severity Rubric（严重程度标准）
+
+> 标签名保留英文，便于模板、lint 和报告统计稳定工作。
 
 ## Critical
 
-- Remote code execution or privilege escalation.
-- Credential or secret leakage in code, artifacts, or logs.
-- Vulnerable dependency with known exploit in production use.
-- Data loss or corruption on normal operation.
-- Complete service unavailability on a realistic failure path.
-- No authentication on a production-facing endpoint.
+- 远程代码执行或权限提升。
+- 代码、制品或日志中泄露凭据或 secret。
+- 生产使用的依赖存在已知可利用漏洞。
+- 正常操作路径会导致数据丢失或损坏。
+- 现实失败路径会导致服务完全不可用。
+- 面向生产的 endpoint 没有认证。
 
 ## High
 
-- Authorization bypass or privilege escalation within the application.
-- SQL/command injection with realistic attack surface.
-- Unhandled panic/crash on expected input or state.
-- Deadlock or live-lock under normal concurrency.
-- Memory leak that exhausts resources within hours.
-- Persistent data inconsistency on partial failure.
-- Missing input validation on security-sensitive paths.
-- Breaking change without version bump in a published package.
-- No test coverage on a critical path.
+- 应用内授权绕过或权限提升。
+- SQL/命令注入，且存在现实攻击面。
+- 预期输入或状态会触发未处理 panic/crash。
+- 正常并发下可能死锁或活锁。
+- 数小时内可耗尽资源的内存泄漏。
+- 局部失败导致持久化数据不一致。
+- 安全敏感路径缺少输入校验。
+- 已发布 package 出现破坏性变更但未升级版本。
+- 关键路径没有测试覆盖。
 
 ## Medium
 
-- XSS or open redirect with realistic constraints.
-- Error message that leaks internal state to the client.
-- Retry without backoff or circuit breaker.
-- No timeout on an external call.
-- Unbounded collection growth under normal load.
-- Large function or module with unclear responsibility.
-- Missing error handling in a non-critical path.
-- Flaky test that fails CI non-deterministically.
-- Slow query on a table expected to grow.
-- Duplicated logic that increases maintenance cost.
+- 存在现实约束下可利用的 XSS 或 open redirect。
+- 错误信息向客户端泄露内部状态。
+- 重试缺少 backoff 或 circuit breaker。
+- 外部调用没有 timeout。
+- 正常负载下集合、缓存或队列无界增长。
+- 大函数或大模块职责不清。
+- 非关键路径缺少错误处理。
+- flaky test 导致 CI 非确定性失败。
+- 预期会增长的数据表存在慢查询。
+- 重复逻辑增加维护成本。
 
 ## Low
 
-- Style violations that do not affect correctness.
-- Missing comments on non-obvious logic.
-- Minor logging inconsistency.
-- Untested edge case in a low-risk path.
-- Dead code that is not actively harmful.
-- Minor documentation inaccuracy.
-- Warning-level linter findings.
+- 不影响正确性的风格问题。
+- 非显然逻辑缺少必要注释。
+- 轻微日志不一致。
+- 低风险路径中的未测试边界情况。
+- 当前没有主动危害的 dead code。
+- 轻微文档不准确。
+- warning 级 linter 发现。
 
 ## Info
 
-- Observations that are not risks but may be relevant context.
-- Architecture notes for future consideration.
-- Patterns that may become risks under different scale.
-- Suggestions that do not meet threshold for any severity level.
+- 不构成风险但有助于理解项目的观察。
+- 供未来参考的架构备注。
+- 在不同规模下可能演变成风险的模式。
+- 未达到任何严重程度门槛的建议。
