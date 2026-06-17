@@ -1,54 +1,54 @@
-# Remediation Plan
+# 修复计划
 
-**Project:** <project name>
-**Based on audit:** <link to audit report or date>
-**Target release:** <version or milestone>
+**项目：** <项目名称>
+**基于审计：** <审计报告链接或日期>
+**目标版本：** <版本或里程碑>
 
 ---
 
-## Phase 1: Critical Fixes (<estimated timeline>)
+## 阶段 1：Critical 问题修复（<预计周期>）
 
-| # | Finding | Fix | Owner | Est. effort | Verification |
-|---|---------|-----|-------|-------------|--------------|
-| 1 | <title> | <minimal fix> | <team/ person> | <time> | <test / review step> |
-| 2 | <title> | <minimal fix> | <team/ person> | <time> | <test / review step> |
+| # | 发现项 | 修复方式 | 负责人 | 预计工作量 | 验证方式 |
+|---|--------|----------|--------|------------|----------|
+| 1 | <标题> | <最小修复> | <团队/人员> | <时间> | <测试/评审步骤> |
+| 2 | <标题> | <最小修复> | <团队/人员> | <时间> | <测试/评审步骤> |
 
-### Verification for Phase 1
-- <specific tests to run>
-- <specific review requirements>
-- <specific deployment steps>
+### 阶段 1 验证
+- <需要运行的具体测试>
+- <具体评审要求>
+- <具体部署步骤>
 
-## Phase 2: High Severity Fixes (<estimated timeline>)
+## 阶段 2：High 问题修复（<预计周期>）
 
-| # | Finding | Fix | Owner | Est. effort | Verification |
-|---|---------|-----|-------|-------------|--------------|
-| 1 | <title> | <minimal fix or long-term fix> | <team/ person> | <time> | <test / review step> |
+| # | 发现项 | 修复方式 | 负责人 | 预计工作量 | 验证方式 |
+|---|--------|----------|--------|------------|----------|
+| 1 | <标题> | <最小修复或长期修复> | <团队/人员> | <时间> | <测试/评审步骤> |
 
-### Verification for Phase 2
-- <specific tests to run>
-- <specific review requirements>
+### 阶段 2 验证
+- <需要运行的具体测试>
+- <具体评审要求>
 
-## Phase 3: Medium Severity Fixes (<estimated timeline>)
+## 阶段 3：Medium 问题修复（<预计周期>）
 
-| # | Finding | Fix | Owner | Est. effort | Verification |
-|---|---------|-----|-------|-------------|--------------|
-| 1 | <title> | <fix> | <team/ person> | <time> | <test / review step> |
+| # | 发现项 | 修复方式 | 负责人 | 预计工作量 | 验证方式 |
+|---|--------|----------|--------|------------|----------|
+| 1 | <标题> | <修复方式> | <团队/人员> | <时间> | <测试/评审步骤> |
 
-## Phase 4: Scheduled Improvements (<estimated timeline>)
+## 阶段 4：排期改进（<预计周期>）
 
-| # | Finding | Fix | Owner | Est. effort | Notes |
-|---|---------|-----|-------|-------------|-------|
-| 1 | <title> | <long-term fix> | <team/ person> | <time> | <depends on, blocks> |
+| # | 发现项 | 修复方式 | 负责人 | 预计工作量 | 备注 |
+|---|--------|----------|--------|------------|------|
+| 1 | <标题> | <长期修复> | <团队/人员> | <时间> | <依赖项、阻塞项> |
 
-## Regression Test Checklist
+## 回归测试清单
 
-- [ ] <test 1>
-- [ ] <test 2>
-- [ ] <test 3>
+- [ ] <测试 1>
+- [ ] <测试 2>
+- [ ] <测试 3>
 
-## Acceptance Criteria
+## 验收标准
 
-- All Critical and High findings have been addressed.
-- Regression tests for all fixed findings pass.
-- CI pipeline is green.
-- <additional project-specific criteria>
+- 所有 Critical 和 High 发现项均已处理。
+- 所有已修复发现项的回归测试均通过。
+- CI pipeline 通过。
+- <其他项目特定验收标准>
